@@ -1,0 +1,48 @@
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const {
+  DB_HOST = 'localhost',
+  DB_USER = 'root',
+  DB_PASSWORD = '',
+  DB_NAME = 'thrifted_db',
+  DB_PORT = 3306,
+} = process.env;
+
+// Create raw connection without database first to ensure database exists
+export async function ensureDatabaseExists() {
+  const connection = await mysql.createConnection({
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    port: Number(DB_PORT),
+  });
+
+  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
+  await connection.end();
+}
+
+// Global connection pool
+export const pool = mysql.createPool({
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_NAME,
+  port: Number(DB_PORT),
+  waitForConnections: true,
+  connectionLimit: 15,
+  queueLimit: 0,
+});
+
+export async function testConnection() {
+  try {
+    await ensureDatabaseExists();
+    const [rows] = await pool.query('SELECT 1 + 1 AS test');
+    console.log('✓ MySQL Database connected successfully:', DB_NAME);
+    return true;
+  } catch (error) {
+    console.error('✗ MySQL Connection Error:', error.message);
+    throw error;
+  }
+}

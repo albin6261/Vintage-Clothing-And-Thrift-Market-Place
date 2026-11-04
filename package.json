@@ -1,0 +1,12 @@
+{
+  "name": "thriftt-workspace",
+  "version": "1.0.0",
+  "description": "Unified runner for THRIFTED vintage clothing marketplace",
+  "scripts": {
+    "start": "npm --prefix backend start",
+    "dev": "npm --prefix backend run dev",
+    "build": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix frontend run build && npm --prefix backend start",
+    "frontend": "npm --prefix frontend run dev"
+  }
+}
